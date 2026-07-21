@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作文项目-内容运营 甘特图</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f5f6f7;
+  color: #1a1a1a;
+  padding: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+.header {
+  margin-bottom: 24px;
+}
+.header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+.header .meta {
+  font-size: 13px;
+  color: #646a73;
+  line-height: 1.6;
+}
+.header .meta span { margin-right: 16px; }
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0 20px;
+  font-size: 12px;
+  color: #646a73;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.legend-dot.milestone {
+  width: 12px; height: 12px;
+  background: none;
+  border: 0;
+  transform: rotate(45deg);
+}
+.gantt-container {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e6eb;
+  overflow: auto;
+  max-width: 100%;
+}
+.gantt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 1100px;
+}
+.gantt-table th {
+  position: sticky;
+  top: 0;
+  background: #f7f8fa;
+  z-index: 10;
+  font-weight: 500;
+  color: #4e5969;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e5e6eb;
+  text-align: center;
+  white-space: nowrap;
+}
+.gantt-table th.task-col { text-align: left; min-width: 200px; }
+.gantt-table th.owner-col { text-align: left; min-width: 90px; }
+.gantt-table th.month-col { min-width: 75px; }
+.gantt-table td {
+  padding: 0;
+  border-bottom: 1px solid #f0f1f3;
+  height: 42px;
+  position: relative;
+}
+.gantt-table td.task-cell {
+  padding: 8px 10px;
+  vertical-align: middle;
+}
+.gantt-table td.owner-cell {
+  padding: 8px 10px;
+  vertical-align: middle;
+  font-size: 11px;
+  color: #646a73;
+}
+.gantt-table td.timeline-cell {
+  padding: 0;
+  position: relative;
+}
+.phase-row td {
+  background: #f7f8fa;
+  font-weight: 600;
+  font-size: 13px;
+  color: #1d2129;
+  padding: 10px 10px;
+  border-bottom: 1px solid #e5e6eb;
+}
+.task-name {
+  font-size: 12px;
+  color: #1d2129;
+  line-height: 1.4;
+}
+.task-name sub {
+  font-size: 10px;
+  color: #86909c;
+  font-weight: 400;
+  display: block;
+  margin-top: 2px;
+}
+.owner-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.owner-wh { background: #e8f3ff; color: #165dff; }
+.owner-ls { background: #fff0e8; color: #f77234; }
+.owner-hh { background: #e8fff0; color: #00b42a; }
+.owner-cd { background: #f0e8ff; color: #722ed1; }
+.owner-hc { background: #e8f5ff; color: #d1c12e; }
+.owner-tm { background: #f2f3f5; color: #86909c; }
+.bar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 22px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  z-index: 2;
+}
+.bar:hover { opacity: 0.85; }
+.bar.p1 { background: #3370ff; }
+.bar.p2 { background: #00b42a; }
+.bar.p3 { background: #ff7d00; }
+.bar.p4 { background: #f53f3f; }
+.bar.ongoing {
+  background: repeating-linear-gradient(45deg, #646a73, #646a73 6px, #7a8088 6px, #7a8088 12px);
+}
+.milestone {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 14px;
+  height: 14px;
+  background: #ffb400;
+  border: 1.5px solid #fff;
+  z-index: 3;
+  cursor: pointer;
+}
+.milestone-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #86909c;
+  white-space: nowrap;
+  z-index: 3;
+  pointer-events: none;
+}
+.grid-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: #f0f1f3;
+  z-index: 1;
+}
+.week-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: #f0f1f3;
+  z-index: 1;
+}
+.today-line {
+  position: absolute;
+  top: -4px; bottom: -4px;
+  width: 2px;
+  background: #f53f3f;
+  z-index: 4;
+}
+.today-badge {
+  position: absolute;
+  top: -20px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #f53f3f;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 4;
+}
+.month-header {
+  display: flex;
+}
+.month-header-cell {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4e5969;
+  padding: 6px 0;
+  border-right: 1px solid #e5e6eb;
+}
+.week-header-cell {
+  text-align: center;
+  font-size: 10px;
+  color: #86909c;
+  padding: 4px 0;
+  border-right: 1px solid #f0f1f3;
+}
+.tooltip {
+  position: fixed;
+  background: #1d2129;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  z-index: 1000;
+  pointer-events: none;
+  display: none;
+  max-width: 280px;
+  white-space: normal;
+}
+.tooltip .tt-title { font-weight: 600; margin-bottom: 4px; }
+.tooltip .tt-row { color: #c9cdd4; font-size: 11px; }
+.summary-cards {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.summary-card {
+  background: #fff;
+  border: 1px solid #e5e6eb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  flex: 1;
+  min-width: 140px;
+}
+.summary-card .label { font-size: 11px; color: #86909c; margin-bottom: 4px; }
+.summary-card .value { font-size: 20px; font-weight: 600; color: #1d2129; }
+.summary-card .sub { font-size: 11px; color: #646a73; margin-top: 2px; }
+.footer-note {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #86909c;
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>作文项目-内容运营 项目甘特图</h1>
+  <div class="meta">
+    <span>会议日期：2026年7月20日（周一）13:55-15:37</span>
+    <span>参会人：李思颖、王佳茜Fiona、黄慧</span>
+    <span>项目周期：2026年7月 - 2026年12月</span>
+  </div>
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card">
+    <div class="label">项目阶段</div>
+    <div class="value">4</div>
+    <div class="sub">产品重构 → 暑期运营 → 沉淀期 → 高峰期</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">任务总数</div>
+    <div class="value">25</div>
+    <div class="sub">含7项持续运营任务</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">关键里程碑</div>
+    <div class="value">5</div>
+    <div class="sub">含粉丝目标、月销破万等</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">暑期核心目标</div>
+    <div class="value">2000</div>
+    <div class="sub">粉丝从980人增长至2000人</div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#3370ff"></div>阶段一：产品体系重构</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#00b42a"></div>阶段二：暑期运营</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff7d00"></div>阶段三：运营沉淀期</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f53f3f"></div>阶段四：需求高峰期</div>
+  <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#646a73,#646a73 3px,#7a8088 3px,#7a8088 6px)"></div>持续运营</div>
+  <div class="legend-item"><div class="legend-dot milestone" style="background:#ffb400"></div>里程碑</div>
+</div>
+
+<div class="gantt-container">
+<table class="gantt-table" id="ganttTable">
+<thead>
+<tr>
+  <th class="task-col" rowspan="2">任务名称</th>
+  <th class="owner-col" rowspan="2">负责人</th>
+  <th colspan="6">7月</th>
+  <th colspan="5">8月</th>
+  <th colspan="4">9月</th>
+  <th colspan="4">10月</th>
+  <th colspan="4">11月</th>
+  <th colspan="4">12月</th>
+</tr>
+<tr id="weekHeader">
+</tr>
+</thead>
+<tbody id="ganttBody">
+</tbody>
+</table>
+</div>
+
+<div class="footer-note">
+  数据来源：智能纪要《作文项目-内容运营 2026年7月20日》 | 时间节点根据会议讨论事项推导，持续运营任务以斜纹条标注 | 生成日期：2026年7月21日
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const TOTAL_WEEKS = 27;
+const JUL_WEEKS = 2;
+const AUG_WEEKS = 5;
+const SEP_WEEKS = 4;
+const OCT_WEEKS = 4;
+const NOV_WEEKS = 4;
+const DEC_WEEKS = 4;
+
+const weekHeader = document.getElementById('weekHeader');
+let weekHTML = '';
+for (let i = 1; i <= TOTAL_WEEKS; i++) {
+  weekHTML += `<th class="week-header-cell">W${i}</th>`;
+}
+weekHeader.innerHTML = weekHTML;
+
+const tasks = [
+  { type: 'phase', name: '阶段一：产品体系重构', color: 'p1' },
+  { name: '产品SKU梳理优化', sub: '下架155元PPT包、视频课定位校准', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 0, end: 1.5 },
+  { name: '套餐定价核算', sub: '598元→498元/4篇学期陪跑', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 0, end: 1 },
+  { name: '新增agent沟通', sub: '对接陈迪同步产品调整需求', owner: '黄慧+陈迪', ownerClass: 'owner-hc', phase: 'p1', start: 0.5, end: 2 },
+  { name: '三阶产品矩阵搭建', sub: '引流层/转化层/高客层', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 1.5, end: 3 },
+  { name: 'AI评测agent开发', sub: '作文能力诊断框架→技术开发', owner: '黄慧+陈迪', ownerClass: 'owner-hc', phase: 'p1', start: 2, end: 5, milestone: { at: 5, label: 'AI评测上线' } },
+  { name: '产品体系落地', sub: '命名/分类调整、推荐逻辑匹配', owner: '团队', ownerClass: 'owner-tm', phase: 'p1', start: 5, end: 7 },
+  { name: '交易链路验证', sub: '微信小店/H5交易链路测试', owner: '团队', ownerClass: 'owner-tm', phase: 'p1', start: 6, end: 8 },
+
+
+  { type: 'phase', name: '阶段二：暑期运营（7月-8月）', color: 'p2' },
+  { name: '封面方案选型', sub: '2套标准封面模板（图文/视频）', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 0, end: 1.5 },
+  { name: '资料合规处理', sub: '46份资料加水印+引导话术', owner: '王佳茜+黄慧', ownerClass: 'owner-wh', phase: 'p2', start: 0, end: 2 },
+  { name: '资料归集上传', sub: '百度文库资料→飞书共享空间', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 0, end: 1.5 },
+  { name: '内容标准化建设', sub: '选题→AI撰写→审核→封面→分发', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 1.5, end: 5 },
+  { name: '视频内容制作', sub: '视频课切片/高点击量文章改视频', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 1.5, end: 5 },
+  { name: '全平台矩阵布局', sub: '小红书→公众号/小绿书同步+助理号', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 2, end: 6 },
+  { name: '直播测试安排', sub: '知识点分享+答疑形式', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 3, end: 6 },
+  { name: '账号权重优化', sub: '每日15-30分钟养号动作', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 0, end: 7, ongoing: true },
+  { name: '爆款链接选题库', sub: '团队每天往4人群丢爆款链接，积累选题素材', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 0, end: 27, ongoing: true },
+  { name: '客服配置操作', sub: '千帆后台多客服登录权限', owner: '黄慧', ownerClass: 'owner-hh', phase: 'p2', start: 0, end: 1.5 },
+  { name: '客服话术整理', sub: '标准用户答疑话术整理输出', owner: '黄慧', ownerClass: 'owner-hh', phase: 'p2', start: 0, end: 2 },
+  { name: '对标数据整理', sub: '对标调研→飞书→AI爬取观测', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 0, end: 2 },
+  { name: '相关工具研究', sub: '直播用软件调研', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 0.5, end: 2.5 },
+  { type: 'milestone', at: 7, label: '暑期目标：粉丝达2000人' },
+
+  { type: 'phase', name: '阶段三：运营沉淀期（9月-10月）', color: 'p3' },
+  { name: '标准化销售转化链路', sub: '打磨可复制的转化流程', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 7, end: 12 },
+  { name: '核心产品放量验证', sub: '验证可复制放量路径', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 8, end: 15 },
+  { name: '内容持续产出', sub: '标准化内容生产流程运转', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 7, end: 15, ongoing: true },
+  { name: '公众号规划运营', sub: '内容搬运/钩子/企微/值班', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p3', start: 7, end: 15, ongoing: true },
+
+  { type: 'phase', name: '阶段四：需求高峰期（11月-12月）', color: 'p4' },
+  { name: '期末考前推广', sub: '考前突击素材包等高需求产品', owner: '团队', ownerClass: 'owner-tm', phase: 'p4', start: 15, end: 22 },
+  { name: '销量规模化增长', sub: '目标：月销售额突破1万元', owner: '团队', ownerClass: 'owner-tm', phase: 'p4', start: 15, end: 27, milestone: { at: 19, label: '月销破万' } },
+  { name: '内容投流启动', sub: '月销>1万后投入10%-20%营收投流', owner: '王佳茜', ownerClass: 'owner-tm', phase: 'p4', start: 19, end: 27 },
+  { type: 'milestone', at: 27, label: '项目阶段性复盘' },
+];
+
+const ganttBody = document.getElementById('ganttBody');
+const cellWidth = 75;
+const tooltip = document.getElementById('tooltip');
+
+const monthBoundaries = [];
+let w = 0;
+[{m:'7月',n:JUL_WEEKS},{m:'8月',n:AUG_WEEKS},{m:'9月',n:SEP_WEEKS},{m:'10月',n:OCT_WEEKS},{m:'11月',n:NOV_WEEKS},{m:'12月',n:DEC_WEEKS}].forEach(mo => {
+  monthBoundaries.push({ label: mo.m, start: w, end: w + mo.n });
+  w += mo.n;
+});
+
+const todayWeek = 0.3;
+
+tasks.forEach((task, idx) => {
+  const tr = document.createElement('tr');
+
+  if (task.type === 'phase') {
+    const td = document.createElement('td');
+    td.colSpan = TOTAL_WEEKS + 2;
+    td.style.background = '#f7f8fa';
+    td.style.fontWeight = '600';
+    td.style.fontSize = '13px';
+    td.style.color = '#1d2129';
+    td.style.padding = '10px 12px';
+    td.style.borderTop = '1px solid #e5e6eb';
+    td.style.borderBottom = '1px solid #e5e6eb';
+    td.textContent = task.name;
+    tr.appendChild(td);
+    ganttBody.appendChild(tr);
+    return;
+  }
+
+  if (task.type === 'milestone') {
+    const tdTask = document.createElement('td');
+    tdTask.style.padding = '8px 10px';
+    tdTask.innerHTML = '<span style="font-size:11px;color:#ffb400;font-weight:500;">&#9670; ' + task.label + '</span>';
+    tr.appendChild(tdTask);
+
+    const tdOwner = document.createElement('td');
+    tdOwner.className = 'owner-cell';
+    tr.appendChild(tdOwner);
+
+    const tdTimeline = document.createElement('td');
+    tdTimeline.className = 'timeline-cell';
+    tdTimeline.colSpan = TOTAL_WEEKS;
+    tdTimeline.style.position = 'relative';
+
+    for (let i = 1; i < TOTAL_WEEKS; i++) {
+      const line = document.createElement('div');
+      line.className = 'grid-line';
+      line.style.left = (i * cellWidth) + 'px';
+      tdTimeline.appendChild(line);
+    }
+
+    const ms = document.createElement('div');
+    ms.className = 'milestone';
+    ms.style.left = (task.at * cellWidth) + 'px';
+    ms.title = task.label;
+    tdTimeline.appendChild(ms);
+
+    const msLabel = document.createElement('div');
+    msLabel.className = 'milestone-label';
+    msLabel.style.left = (task.at * cellWidth + 10) + 'px';
+    msLabel.textContent = task.label;
+    msLabel.style.fontSize = '10px';
+    msLabel.style.color = '#ffb400';
+    msLabel.style.fontWeight = '500';
+    tdTimeline.appendChild(msLabel);
+
+    tr.appendChild(tdTimeline);
+    ganttBody.appendChild(tr);
+    return;
+  }
+
+  const tdTask = document.createElement('td');
+  tdTask.className = 'task-cell';
+  tdTask.innerHTML = `<div class="task-name">${task.name}<sub>${task.sub || ''}</sub></div>`;
+  tr.appendChild(tdTask);
+
+  const tdOwner = document.createElement('td');
+  tdOwner.className = 'owner-cell';
+  tdOwner.innerHTML = `<span class="owner-tag ${task.ownerClass}">${task.owner}</span>`;
+  tr.appendChild(tdOwner);
+
+  const tdTimeline = document.createElement('td');
+  tdTimeline.className = 'timeline-cell';
+  tdTimeline.colSpan = TOTAL_WEEKS;
+  tdTimeline.style.position = 'relative';
+
+  for (let i = 1; i < TOTAL_WEEKS; i++) {
+    const line = document.createElement('div');
+    line.className = 'grid-line';
+    line.style.left = (i * cellWidth) + 'px';
+    tdTimeline.appendChild(line);
+  }
+
+  const bar = document.createElement('div');
+  bar.className = 'bar ' + (task.ongoing ? 'ongoing' : task.phase);
+  const barWidth = (task.end - task.start) * cellWidth;
+  bar.style.left = (task.start * cellWidth) + 'px';
+  bar.style.width = barWidth + 'px';
+
+  const weekLabels = ['一','二','三','四','五','六','日','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七'];
+  const startMonthWeek = getMonthWeekLabel(task.start);
+  const endMonthWeek = getMonthWeekLabel(task.end);
+
+  bar.addEventListener('mouseenter', function(e) {
+    tooltip.innerHTML = `
+      <div class="tt-title">${task.name}</div>
+      <div class="tt-row">${task.sub || ''}</div>
+      <div class="tt-row">负责人：${task.owner}</div>
+      <div class="tt-row">周期：${startMonthWeek} ~ ${endMonthWeek}</div>
+      ${task.ongoing ? '<div class="tt-row" style="color:#ffb400;">持续运营任务</div>' : ''}
+    `;
+    tooltip.style.display = 'block';
+  });
+  bar.addEventListener('mousemove', function(e) {
+    tooltip.style.left = (e.clientX + 12) + 'px';
+    tooltip.style.top = (e.clientY + 12) + 'px';
+  });
+  bar.addEventListener('mouseleave', function() {
+    tooltip.style.display = 'none';
+  });
+
+  if (barWidth > 60) {
+    bar.textContent = task.ongoing ? '持续' : (task.end - task.start) + '周';
+  }
+  tdTimeline.appendChild(bar);
+
+  if (task.milestone) {
+    const ms = document.createElement('div');
+    ms.className = 'milestone';
+    ms.style.left = (task.milestone.at * cellWidth) + 'px';
+    ms.style.background = '#f53f3f';
+    tdTimeline.appendChild(ms);
+
+    const msLabel = document.createElement('div');
+    msLabel.className = 'milestone-label';
+    msLabel.style.left = (task.milestone.at * cellWidth + 10) + 'px';
+    msLabel.textContent = task.milestone.label;
+    msLabel.style.color = '#f53f3f';
+    tdTimeline.appendChild(msLabel);
+  }
+
+  const todayLine = document.createElement('div');
+  todayLine.className = 'today-line';
+  todayLine.style.left = (todayWeek * cellWidth) + 'px';
+  tdTimeline.appendChild(todayLine);
+
+  tr.appendChild(tdTimeline);
+  ganttBody.appendChild(tr);
+});
+
+function getMonthWeekLabel(weekIdx) {
+  const months = [
+    {name:'7月', weeks: JUL_WEEKS},
+    {name:'8月', weeks: AUG_WEEKS},
+    {name:'9月', weeks: SEP_WEEKS},
+    {name:'10月', weeks: OCT_WEEKS},
+    {name:'11月', weeks: NOV_WEEKS},
+    {name:'12月', weeks: DEC_WEEKS},
+  ];
+  let acc = 0;
+  for (const m of months) {
+    if (weekIdx < acc + m.weeks) {
+      return m.name + 'W' + Math.ceil(weekIdx - acc + 1);
+    }
+    acc += m.weeks;
+  }
+  return '12月末';
+}
+</script>
+
+</body>
+</html>

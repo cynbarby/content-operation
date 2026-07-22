@@ -289,7 +289,7 @@ body {
   </div>
   <div class="summary-card">
     <div class="label">任务总数</div>
-    <div class="value">25</div>
+    <div class="value">26</div>
     <div class="sub">含7项持续运营任务</div>
   </div>
   <div class="summary-card">
@@ -335,7 +335,7 @@ body {
 </div>
 
 <div class="footer-note">
-  数据来源：智能纪要《作文项目-内容运营 2026年7月20日》 | 时间节点根据会议讨论事项推导，持续运营任务以斜纹条标注 | 生成日期：2026年7月21日
+  数据来源：智能纪要《作文项目-内容运营 2026年7月20日》 | 时间节点根据会议讨论事项推导，持续运营任务以斜纹条标注 | 生成日期：2026年7月22日
 </div>
 
 <div class="tooltip" id="tooltip"></div>
@@ -356,45 +356,49 @@ for (let i = 1; i <= TOTAL_WEEKS; i++) {
 }
 weekHeader.innerHTML = weekHTML;
 
+// 1. 今日红线精确对齐到 7月22日（W4开头）
+const todayWeek = 3.1;
+
+// 2. 更新全量任务排期
 const tasks = [
   { type: 'phase', name: '阶段一：产品体系重构', color: 'p1' },
-  { name: '产品SKU梳理优化', sub: '下架155元PPT包、视频课定位校准', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 0, end: 1.5 },
-  { name: '套餐定价核算', sub: '598元→498元/4篇学期陪跑', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 0, end: 1 },
-  { name: '新增agent沟通', sub: '对接陈迪同步产品调整需求', owner: '黄慧+陈迪', ownerClass: 'owner-hc', phase: 'p1', start: 0.5, end: 2 },
-  { name: '测评出题与诊断模板（作文MBTI项目）', sub: '设计5-8道场景题及3套学生特质评语', owner: '团队', ownerClass: 'owner-tm', phase: 'p1', start: 1.5, end: 2.5 }, 
-  { name: '趣味作文特质测评（作文MBTI项目）', sub: 'MBTI式场景测试：测素材段位/切入点画像', owner: '陈迪', ownerClass: 'owner-cd', phase: 'p1', start: 1.5, end: 3.5 },
-  { name: '三阶产品矩阵搭建', sub: '引流层/转化层/高客层', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 1.5, end: 3 },
-  { name: 'AI评测agent开发', sub: '作文能力诊断框架→技术开发', owner: '黄慧+陈迪', ownerClass: 'owner-hc', phase: 'p1', start: 2, end: 5, milestone: { at: 5, label: 'AI评测上线' } },
-  { name: '产品体系落地', sub: '命名/分类调整、推荐逻辑匹配', owner: '团队', ownerClass: 'owner-tm', phase: 'p1', start: 5, end: 7 },
-  { name: '交易链路验证', sub: '微信小店/H5交易链路测试', owner: '团队', ownerClass: 'owner-tm', phase: 'p1', start: 6, end: 8 },
+  { name: '产品SKU梳理优化', sub: '下架155元PPT包、视频课定位校准', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 3.0, end: 4.5 },
+  { name: '套餐定价核算', sub: '598元→498元/4篇学期陪跑', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 3.0, end: 4.0 },
+  { name: '新增agent沟通', sub: '对接陈迪同步产品调整需求', owner: '黄慧+陈迪', ownerClass: 'owner-hc', phase: 'p1', start: 3.5, end: 5.0 },
+  { name: '测评出题与诊断模板（作文MBTI项目）', sub: '设计5-8道场景题及3套学生特质评语', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 3.5, end: 4.5 },
+  { name: '趣味作文特质测评（作文MBTI项目）', sub: 'MBTI式场景测试：测素材段位/切入点画像', owner: '陈迪', ownerClass: 'owner-cd', phase: 'p1', start: 3.5, end: 5.5 },
+  { name: '三阶产品矩阵搭建', sub: '引流层/转化层/高客层', owner: '黄慧+王佳茜', ownerClass: 'owner-wh', phase: 'p1', start: 4.0, end: 5.5 },
+  { name: 'AI评测agent开发', sub: '作文能力诊断框架→技术开发', owner: '黄慧+陈迪', ownerClass: 'owner-hc', phase: 'p1', start: 4.0, end: 7.0, milestone: { at: 7, label: 'AI评测上线' } },
+  { name: '产品体系落地', sub: '命名/分类调整、推荐逻辑匹配', owner: '团队', ownerClass: 'owner-tm', phase: 'p1', start: 6.0, end: 8.0 },
+  { name: '交易链路验证', sub: '微信小店/H5交易链路测试', owner: '团队', ownerClass: 'owner-tm', phase: 'p1', start: 7.0, end: 9.0 },
 
   { type: 'phase', name: '阶段二：暑期运营（7月-8月）', color: 'p2' },
-  { name: '封面方案选型', sub: '2套标准封面模板（图文/视频）', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 0, end: 1.5 },
-  { name: '资料合规处理', sub: '46份资料加水印+引导话术', owner: '王佳茜+黄慧', ownerClass: 'owner-wh', phase: 'p2', start: 0, end: 2 },
-  { name: '资料归集上传', sub: '百度文库资料→飞书共享空间', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 0, end: 1.5 },
-  { name: '内容标准化建设', sub: '选题→AI撰写→审核→封面→分发', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 1.5, end: 5 },
-  { name: '视频内容制作', sub: '视频课切片/高点击量文章改视频', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 1.5, end: 5 },
-  { name: '全平台矩阵布局', sub: '小红书→公众号/小绿书同步+助理号', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 2, end: 6 },
-  { name: '直播测试安排', sub: '知识点分享+答疑形式', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 3, end: 6 },
-  { name: '账号权重优化', sub: '每日15-30分钟养号动作', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 0, end: 7, ongoing: true },
-  { name: '爆款链接选题库', sub: '团队每天往4人群丢爆款链接，积累选题素材', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 0, end: 27, ongoing: true },
-  { name: '客服配置操作', sub: '千帆后台多客服登录权限', owner: '黄慧', ownerClass: 'owner-hh', phase: 'p2', start: 0, end: 1.5 },
-  { name: '客服话术整理', sub: '标准用户答疑话术整理输出', owner: '黄慧', ownerClass: 'owner-hh', phase: 'p2', start: 0, end: 2 },
-  { name: '对标数据整理', sub: '对标调研→飞书→AI爬取观测', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 0, end: 2 },
-  { name: '相关工具研究', sub: '直播用软件调研', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 0.5, end: 2.5 },
-  { name: '测评引流上线与复盘 (作文MBTI项目)', sub: '小红书发帖引流企微，首批解读', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 3.5, end: 5 },
-  { type: 'milestone', at: 7, label: '暑期目标：粉丝达2000人' },
+  { name: '封面方案选型', sub: '2套标准封面模板（图文/视频）', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 3.0, end: 4.5 },
+  { name: '资料合规处理', sub: '46份资料加水印+引导话术', owner: '王佳茜+黄慧', ownerClass: 'owner-wh', phase: 'p2', start: 3.0, end: 5.0 },
+  { name: '资料归集上传', sub: '百度文库资料→飞书共享空间', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 3.0, end: 4.5 },
+  { name: '客服配置操作', sub: '千帆后台多客服登录权限', owner: '黄慧', ownerClass: 'owner-hh', phase: 'p2', start: 3.0, end: 4.5 },
+  { name: '客服话术整理', sub: '标准用户答疑话术整理输出', owner: '黄慧', ownerClass: 'owner-hh', phase: 'p2', start: 3.0, end: 5.0 },
+  { name: '对标数据整理', sub: '对标调研→飞书→AI爬取观测', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 3.0, end: 5.0 },
+  { name: '相关工具研究', sub: '直播用软件调研', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 3.5, end: 5.5 },
+  { name: '内容标准化建设', sub: '选题→AI撰写→审核→封面→分发', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 4.5, end: 8.0 },
+  { name: '视频内容制作', sub: '视频课切片/高点击量文章改视频', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p2', start: 4.5, end: 8.0 },
+  { name: '全平台矩阵布局', sub: '小红书→公众号/小绿书同步+助理号', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 5.0, end: 9.0 },
+  { name: '测评引流上线与复盘 (作文MBTI项目)', sub: '小红书发帖引流企微，首批解读', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 5.5, end: 7.0 },
+  { name: '直播测试安排', sub: '知识点分享+答疑形式', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 6.0, end: 9.0 },
+  { name: '账号权重优化', sub: '每日15-30分钟养号动作', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 3.0, end: 9.0, ongoing: true },
+  { name: '爆款链接选题库', sub: '团队每天往4人群丢爆款链接，积累选题素材', owner: '团队', ownerClass: 'owner-tm', phase: 'p2', start: 3.0, end: 27.0, ongoing: true },
+  { type: 'milestone', at: 9, label: '暑期目标：粉丝达2000人' },
 
   { type: 'phase', name: '阶段三：运营沉淀期（9月-10月）', color: 'p3' },
-  { name: '标准化销售转化链路', sub: '打磨可复制的转化流程', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 7, end: 12 },
-  { name: '核心产品放量验证', sub: '验证可复制放量路径', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 8, end: 15 },
-  { name: '内容持续产出', sub: '标准化内容生产流程运转', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 7, end: 15, ongoing: true },
-  { name: '公众号规划运营', sub: '内容搬运/钩子/企微/值班', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p3', start: 7, end: 15, ongoing: true },
+  { name: '标准化销售转化链路', sub: '打磨可复制的转化流程', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 9, end: 14 },
+  { name: '核心产品放量验证', sub: '验证可复制放量路径', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 10, end: 17 },
+  { name: '内容持续产出', sub: '标准化内容生产流程运转', owner: '团队', ownerClass: 'owner-tm', phase: 'p3', start: 9, end: 17, ongoing: true },
+  { name: '公众号规划运营', sub: '内容搬运/钩子/企微/值班', owner: '李思颖', ownerClass: 'owner-ls', phase: 'p3', start: 9, end: 17, ongoing: true },
 
   { type: 'phase', name: '阶段四：需求高峰期（11月-12月）', color: 'p4' },
-  { name: '期末考前推广', sub: '考前突击素材包等高需求产品', owner: '团队', ownerClass: 'owner-tm', phase: 'p4', start: 15, end: 22 },
-  { name: '销量规模化增长', sub: '目标：月销售额突破1万元', owner: '团队', ownerClass: 'owner-tm', phase: 'p4', start: 15, end: 27, milestone: { at: 19, label: '月销破万' } },
-  { name: '内容投流启动', sub: '月销>1万后投入10%-20%营收投流', owner: '王佳茜', ownerClass: 'owner-tm', phase: 'p4', start: 19, end: 27 },
+  { name: '期末考前推广', sub: '考前突击素材包等高需求产品', owner: '团队', ownerClass: 'owner-tm', phase: 'p4', start: 17, end: 23 },
+  { name: '销量规模化增长', sub: '目标：月销售额突破1万元', owner: '团队', ownerClass: 'owner-tm', phase: 'p4', start: 17, end: 27, milestone: { at: 21, label: '月销破万' } },
+  { name: '内容投流启动', sub: '月销>1万后投入10%-20%营收投流', owner: '王佳茜', ownerClass: 'owner-tm', phase: 'p4', start: 21, end: 27 },
   { type: 'milestone', at: 27, label: '项目阶段性复盘' },
 ];
 
@@ -408,8 +412,6 @@ let w = 0;
   monthBoundaries.push({ label: mo.m, start: w, end: w + mo.n });
   w += mo.n;
 });
-
-const todayWeek = 0.3;
 
 tasks.forEach((task, idx) => {
   const tr = document.createElement('tr');
@@ -500,7 +502,6 @@ tasks.forEach((task, idx) => {
   bar.style.left = (task.start * cellWidth) + 'px';
   bar.style.width = barWidth + 'px';
 
-  const weekLabels = ['一','二','三','四','五','六','日','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七'];
   const startMonthWeek = getMonthWeekLabel(task.start);
   const endMonthWeek = getMonthWeekLabel(task.end);
 
